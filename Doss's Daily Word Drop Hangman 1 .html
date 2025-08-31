@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doss's Daily Word Drop – Hangman Edition</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+  h1 { color: #2c3e50; }
+  #clue { font-size: 1.2em; margin: 15px; color: #34495e; }
+  #word { font-size: 2em; letter-spacing: 12px; margin: 20px; }
+  #letters button { margin: 5px; padding: 10px 15px; font-size: 1em; cursor: pointer; }
+  #letters button:disabled { background-color: #ccc; cursor: not-allowed; }
+  #wrong-guesses { margin: 20px; font-size: 1.2em; color: red; }
+  #message { font-size: 1.3em; margin: 15px; color: green; }
+  #hangman { margin: 20px auto; width: 120px; height: 160px; position: relative; }
+  .stick-part { display: none; position: absolute; background-color: #000; }
+  #base { bottom: 0; left: 0; width: 120px; height: 10px; }
+  #pole { bottom: 10px; left: 50px; width: 10px; height: 150px; }
+  #beam { top: 0; left: 50px; width: 70px; height: 10px; }
+  #rope { top: 10px; left: 110px; width: 2px; height: 20px; background-color: black; }
+  #head { top: 30px; left: 100px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
+  #body { top: 50px; left: 109px; width: 2px; height: 50px; background-color: black; }
+  #left-arm { top: 60px; left: 109px; width: 30px; height: 2px; transform: rotate(-45deg); transform-origin: left; background-color: black; }
+  #right-arm { top: 60px; left: 81px; width: 30px; height: 2px; transform: rotate(45deg); transform-origin: right; background-color: black; }
+  #left-leg { top: 100px; left: 109px; width: 30px; height: 2px; transform: rotate(45deg); transform-origin: left; background-color: black; }
+  #right-leg { top: 100px; left: 81px; width: 30px; height: 2px; transform: rotate(-45deg); transform-origin: right; background-color: black; }
+  #start { margin-top: 20px; padding: 10px 20px; font-size: 1em; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h1>Doss's Daily Word Drop – Hangman Edition</h1>
+
+<!-- ====== DAILY WORD & CLUE ====== -->
+<script>
+const DAILY_WORD = "APRICITY"; // <-- The word of the day
+const DAILY_CLUE = "Such a simple, everyday sensation—sunlight on a cold day—deserves its own elegant word, yet it’s almost forgotten in modern English."; // <-- The clue
+</script>
+<!-- ====== END DAILY WORD & CLUE ====== -->
+
+<div id="clue"></div>
+<div id="word"></div>
+<div id="letters"></div>
+<div id="wrong-guesses">Wrong guesses: 0 / 6</div>
+<div id="message"></div>
+<div id="hangman">
+  <div id="base" class="stick-part"></div>
+  <div id="pole" class="stick-part"></div>
+  <div id="beam" class="stick-part"></div>
+  <div id="rope" class="stick-part"></div>
+  <div id="head" class="stick-part"></div>
+  <div id="body" class="stick-part"></div>
+  <div id="left-arm" class="stick-part"></div>
+  <div id="right-arm" class="stick-part"></div>
+  <div id="left-leg" class="stick-part"></div>
+  <div id="right-leg" class="stick-part"></div>
+</div>
+<button id="start">Start Hangman</button>
+
+<script>
+let word = DAILY_WORD;
+let clueText = DAILY_CLUE;
+let guessed = [];
+let wrong = 0;
+const maxWrong = 6;
+const wordDiv = document.getElementById('word');
+const lettersDiv = document.getElementById('letters');
+const wrongDiv = document.getElementById('wrong-guesses');
+const messageDiv = document.getElementById('message');
+const startBtn = document.getElementById('start');
+const clueDiv = document.getElementById('clue');
+const stickParts = ["head","body","left-arm","right-arm","left-leg","right-leg"];
+
+clueDiv.textContent = "Clue: " + clueText;
+
+function displayWord() {
+  let display = "";
+  for (let char of word) {
+    display += guessed.includes(char) ? char + " " : "_ ";
+  }
+  wordDiv.textContent = display.trim();
+}
+
+function createButtons() {
+  lettersDiv.innerHTML = "";
+  for (let i = 65; i <= 90; i++) {
+    const letter = String.fromCharCode(i);
+    const button = document.createElement('button');
+    button.textContent = letter;
+    button.onclick = () => guess(letter, button);
+    lettersDiv.appendChild(button);
+  }
+}
+
+function guess(letter, btn) {
+  if (guessed.includes(letter)) return;
+  guessed.push(letter);
+  btn.disabled = true;
+  if (!word.includes(letter)) {
+    document.getElementById(stickParts[wrong]).style.display = "block";
+    wrong++;
+    wrongDiv.textContent = `Wrong guesses: ${wrong} / ${maxWrong}`;
+    if (wrong >= maxWrong) {
+      messageDiv.style.color = "red";
+      messageDiv.textContent = "Game Over! Try again tomorrow.";
+      disableAllButtons();
+    }
+  } else {
+    displayWord();
+    if (!word.split("").some(l => !guessed.includes(l))) {
+      messageDiv.style.color = "green";
+      messageDiv.textContent = "Congratulations! You found the word!";
+      disableAllButtons();
+    }
+  }
+}
+
+function disableAllButtons() {
+  const buttons = lettersDiv.getElementsByTagName('button');
+  for (let btn of buttons) btn.disabled = true;
+}
+
+function startGame() {
+  guessed = [];
+  wrong = 0;
+  messageDiv.textContent = "";
+  wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
+  stickParts.forEach(p => document.getElementById(p).style.display = "none");
+  createButtons();
+  displayWord();
+  startBtn.style.display = "none";
+}
+
+startBtn.onclick = startGame;
+</script>
+
+</body>
+</html>
