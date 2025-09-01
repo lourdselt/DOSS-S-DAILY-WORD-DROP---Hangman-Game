@@ -11,7 +11,7 @@
     text-align: center; 
     margin: 0; 
     padding: 40px 0; 
-    background: #ffffff; /* white Canva-style */
+    background: #ffffff; /* Canva white style */
     min-height: 100vh; 
     display: flex; 
     flex-direction: column; 
@@ -36,14 +36,14 @@
     font-size: 2em;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin: 25px 0;
   }
   #word span {
     display: inline-block;
-    width: 40px;          
-    height: 50px;         
-    line-height: 50px;    
+    width: 50px;         
+    height: 60px;        
+    line-height: 60px;   
     border-bottom: 3px solid #2c3e50;
     text-align: center;
     font-size: 2em;
@@ -85,8 +85,8 @@
   }
   #hangman { 
     margin: 20px auto; 
-    width: 140px; 
-    height: 180px; 
+    width: 160px; 
+    height: 200px; 
     position: relative; 
   }
   .stick-part { 
@@ -94,16 +94,18 @@
     position: absolute; 
     background-color: #000; 
   }
-  #base { bottom: 0; left: 0; width: 140px; height: 10px; }
-  #pole { bottom: 10px; left: 60px; width: 10px; height: 170px; }
-  #beam { top: 0; left: 60px; width: 80px; height: 10px; }
-  #rope { top: 10px; left: 140px; width: 2px; height: 25px; background-color: black; }
-  #head { top: 35px; left: 130px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
-  #body { top: 55px; left: 139px; width: 2px; height: 60px; background-color: black; }
-  #left-arm { top: 65px; left: 139px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: left; background-color: black; }
-  #right-arm { top: 65px; left: 102px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: right; background-color: black; }
-  #left-leg { top: 115px; left: 139px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: left; background-color: black; }
-  #right-leg { top: 115px; left: 102px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: right; background-color: black; }
+  /* Hanger parts */
+  #base { bottom: 0; left: 0; width: 160px; height: 10px; display: block; }
+  #pole { bottom: 10px; left: 70px; width: 10px; height: 190px; display: block; }
+  #beam { top: 0; left: 70px; width: 90px; height: 10px; display: block; }
+  #rope { top: 10px; left: 160px; width: 2px; height: 25px; display: block; background-color: black; }
+  /* Human figure parts */
+  #head { top: 35px; left: 150px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
+  #body { top: 55px; left: 159px; width: 2px; height: 60px; background-color: black; }
+  #left-arm { top: 65px; left: 159px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: left; background-color: black; }
+  #right-arm { top: 65px; left: 122px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: right; background-color: black; }
+  #left-leg { top: 115px; left: 159px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: left; background-color: black; }
+  #right-leg { top: 115px; left: 122px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: right; background-color: black; }
   #start { 
     margin-top: 20px; 
     padding: 12px 25px; 
@@ -151,7 +153,7 @@ let clueText = "You’ve heard this before… don’t mess it up.";
 let guessed = [];
 let wrong = 0;
 const maxWrong = 6;
-const stickParts = ["head","body","left-arm","right-arm","left-leg","right-leg"];
+const humanParts = ["head","body","left-arm","right-arm","left-leg","right-leg"];
 
 const wordDiv = document.getElementById('word');
 const lettersDiv = document.getElementById('letters');
@@ -188,7 +190,9 @@ function guess(letter, btn) {
   btn.disabled = true;
 
   if (!word.includes(letter)) {
-    document.getElementById(stickParts[wrong]).style.display = "block";
+    if (wrong < humanParts.length) {
+      document.getElementById(humanParts[wrong]).style.display = "block";
+    }
     wrong++;
     wrongDiv.textContent = `Wrong guesses: ${wrong} / ${maxWrong}`;
 
@@ -220,14 +224,14 @@ function startGame() {
   wrong = 0;
   messageDiv.textContent = "";
   wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
-  
-  // Show hanger parts immediately
+
+  // Show hanger
   ['base','pole','beam','rope'].forEach(p => {
     document.getElementById(p).style.display = "block";
   });
 
-  // Hide human figure parts
-  ['head','body','left-arm','right-arm','left-leg','right-leg'].forEach(p => {
+  // Hide human parts
+  humanParts.forEach(p => {
     document.getElementById(p).style.display = "none";
   });
 
@@ -235,7 +239,6 @@ function startGame() {
   displayWord();
   startBtn.style.display = "none";
 }
-
 startBtn.onclick = startGame;
 </script>
 
