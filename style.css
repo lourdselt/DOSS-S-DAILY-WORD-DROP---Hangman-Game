@@ -24,11 +24,6 @@ body {
   color: #555;
 }
 
-#clue-icon {
-  font-size: 1.5rem;
-  margin-right: 10px;
-}
-
 .word {
   font-size: 2rem;
   letter-spacing: 10px;
@@ -91,8 +86,8 @@ body {
   width: 6px;
   height: var(--line-length, 50px);
   border-radius: 3px;
-  transform: scaleY(0);      /* start hidden */
-  transform-origin: top;     /* draw from top */
+  transform: scaleY(0);
+  transform-origin: top;
   transition: transform 0.5s ease;
 }
 
@@ -102,7 +97,7 @@ body {
   border-radius: 50%;
   top: 0;
   left: 50%;
-  transform: scale(0);       /* circle grows */
+  transform: scale(0);
   transform-origin: center;
 }
 
