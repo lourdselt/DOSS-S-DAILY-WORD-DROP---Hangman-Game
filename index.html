@@ -35,12 +35,21 @@
     border-radius: 12px;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
   }
-  #word { 
-    font-size: 2em; 
-    letter-spacing: 12px; 
-    margin: 20px; 
+  #word {
+    font-size: 2em;
+    letter-spacing: 15px;
+    margin: 20px;
     color: #2c3e50;
     text-shadow: 1px 1px #fff;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #word span {
+    display: inline-block;
+    width: 30px;
+    border-bottom: 3px solid #2c3e50;
+    text-align: center;
   }
   #letters button { 
     margin: 5px; 
@@ -137,8 +146,8 @@
 <button id="start">Start Hangman</button>
 
 <script>
-let word = "";
-let clueText = "";
+let word = "BUNGLE"; // tomorrow's word
+let clueText = "You’ve heard this before… don’t mess it up.";
 let guessed = [];
 let wrong = 0;
 const maxWrong = 6;
@@ -151,23 +160,15 @@ const messageDiv = document.getElementById('message');
 const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
-// Load word from JSON or fallback
-fetch('words.json')
-  .then(response => response.json())
-  .then(data => {
-    word = data[0].word.toUpperCase();
-    clueText = data[0].clue;
-    clueDiv.textContent = "Clue: " + clueText;
-    displayWord();
-  })
-  .catch(err => console.error("Error loading words.json:", err));
+clueDiv.textContent = "Clue: " + clueText;
 
 function displayWord() {
-  let display = "";
+  wordDiv.innerHTML = "";
   for (let char of word) {
-    display += guessed.includes(char) ? char + " " : "_ ";
+    const span = document.createElement('span');
+    span.textContent = guessed.includes(char) ? char : "";
+    wordDiv.appendChild(span);
   }
-  wordDiv.textContent = display.trim();
 }
 
 function createButtons() {
@@ -204,7 +205,6 @@ function guess(letter, btn) {
     if (!word.split("").some(l => !guessed.includes(l))) {
       messageDiv.style.color = "green";
       messageDiv.textContent = "Congratulations! You found the word!";
-      displayWord(); 
       disableAllButtons();
     }
   }
@@ -220,14 +220,7 @@ function startGame() {
   wrong = 0;
   messageDiv.textContent = "";
   wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
-
-  document.getElementById('base').style.display = "block";
-  document.getElementById('pole').style.display = "block";
-  document.getElementById('beam').style.display = "block";
-  document.getElementById('rope').style.display = "block";
-
   stickParts.forEach(p => document.getElementById(p).style.display = "none");
-
   createButtons();
   displayWord();
   startBtn.style.display = "none";
