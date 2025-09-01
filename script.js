@@ -1,28 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const word = dailyWord;
-  const clue = dailyClue;
-  const icon = dailyIcon;
-
   const wordDisplay = document.getElementById("word-display");
   const lettersContainer = document.getElementById("letters");
   const hangmanLines = document.querySelectorAll(".line");
   const progressBar = document.getElementById("progress-bar");
   const resetButton = document.getElementById("reset");
+  const clueElement = document.getElementById("clue");
+  const iconElement = document.getElementById("clue-icon");
 
-  document.getElementById("clue").textContent = clue;
-  document.getElementById("clue-icon").textContent = icon;
-
+  let word = "";
+  let clue = "";
+  let icon = "";
   let correctGuesses = [];
   let wrongGuesses = 0;
 
-  // Generate A-Z buttons
-  for (let i = 65; i <= 90; i++) {
-      const letter = String.fromCharCode(i);
-      const button = document.createElement("button");
-      button.textContent = letter;
-      button.addEventListener("click", () => handleGuess(letter, button));
-      lettersContainer.appendChild(button);
+  // Fetch daily word from JSON
+  fetch("words.json")
+    .then(res => res.json())
+    .then(data => {
+      word = data.word.toUpperCase();
+      clue = data.clue;
+      icon = data.icon;
+
+      clueElement.textContent = clue;
+      iconElement.textContent = icon;
+
+      setupLetters();
+      updateWordDisplay();
+    })
+    .catch(err => {
+      console.error("Error loading words.json:", err);
+      clueElement.textContent = "Error loading daily word!";
+    });
+
+  function setupLetters() {
+    for (let i = 65; i <= 90; i++) {
+        const letter = String.fromCharCode(i);
+        const button = document.createElement("button");
+        button.textContent = letter;
+        button.addEventListener("click", () => handleGuess(letter, button));
+        lettersContainer.appendChild(button);
+    }
   }
 
   function handleGuess(letter, button) {
@@ -71,7 +89,5 @@ document.addEventListener("DOMContentLoaded", () => {
       updateWordDisplay();
       document.querySelectorAll(".letters button").forEach(btn => btn.disabled = false);
   });
-
-  updateWordDisplay();
 
 });
