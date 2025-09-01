@@ -220,7 +220,17 @@ function startGame() {
   wrong = 0;
   messageDiv.textContent = "";
   wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
-  stickParts.forEach(p => document.getElementById(p).style.display = "none");
+  
+  // Show hanger parts immediately
+  ['base','pole','beam','rope'].forEach(p => {
+    document.getElementById(p).style.display = "block";
+  });
+
+  // Hide human figure parts
+  ['head','body','left-arm','right-arm','left-leg','right-leg'].forEach(p => {
+    document.getElementById(p).style.display = "none";
+  });
+
   createButtons();
   displayWord();
   startBtn.style.display = "none";
