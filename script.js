@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let correctGuesses = [];
   let wrongGuesses = 0;
 
-  // Fetch daily word from JSON
   fetch("words.json")
     .then(res => res.json())
     .then(data => {
