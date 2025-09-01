@@ -6,28 +6,111 @@
 <title>Doss's Daily Word Drop – Hangman Edition</title>
 <link rel="icon" href="favicon.png" type="image/png">
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background: #f9f9f9; }
-  h1 { color: #2c3e50; }
-  #clue { font-size: 1.2em; margin: 15px; color: #34495e; }
-  #word { font-size: 2em; letter-spacing: 12px; margin: 20px; }
-  #letters button { margin: 5px; padding: 10px 15px; font-size: 1em; cursor: pointer; }
-  #letters button:disabled { background-color: #ccc; cursor: not-allowed; }
-  #wrong-guesses { margin: 20px; font-size: 1.2em; color: red; }
-  #message { font-size: 1.3em; margin: 15px; color: green; }
-  #hangman { margin: 20px auto; width: 120px; height: 160px; position: relative; }
-  .stick-part { display: none; position: absolute; background-color: #000; }
-  #base { bottom: 0; left: 0; width: 120px; height: 10px; }
-  #pole { bottom: 10px; left: 50px; width: 10px; height: 150px; }
-  #beam { top: 0; left: 50px; width: 70px; height: 10px; }
-  #rope { top: 10px; left: 110px; width: 2px; height: 20px; background-color: black; }
-  #head { top: 30px; left: 100px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
-  #body { top: 50px; left: 109px; width: 2px; height: 50px; background-color: black; }
-  #left-arm { top: 60px; left: 109px; width: 30px; height: 2px; transform: rotate(-45deg); transform-origin: left; background-color: black; }
-  #right-arm { top: 60px; left: 81px; width: 30px; height: 2px; transform: rotate(45deg); transform-origin: right; background-color: black; }
-  #left-leg { top: 100px; left: 109px; width: 30px; height: 2px; transform: rotate(45deg); transform-origin: left; background-color: black; }
-  #right-leg { top: 100px; left: 81px; width: 30px; height: 2px; transform: rotate(-45deg); transform-origin: right; background-color: black; }
-  #start { margin-top: 20px; padding: 10px 20px; font-size: 1em; cursor: pointer; background-color: #2980b9; color: white; border: none; border-radius: 5px; }
-  #start:hover { background-color: #3498db; }
+  body { 
+    font-family: 'Poppins', Arial, sans-serif; 
+    text-align: center; 
+    margin: 0; 
+    padding: 0; 
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5); 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+  h1 { 
+    color: #2c3e50; 
+    font-size: 2em; 
+    margin-bottom: 20px; 
+    text-shadow: 1px 1px 2px #fff; 
+  }
+  #clue { 
+    font-size: 1.2em; 
+    margin: 15px; 
+    color: #34495e; 
+    max-width: 90%; 
+    background: rgba(255,255,255,0.7); 
+    padding: 10px 15px; 
+    border-radius: 12px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  }
+  #word { 
+    font-size: 2em; 
+    letter-spacing: 12px; 
+    margin: 20px; 
+    color: #2c3e50;
+    text-shadow: 1px 1px #fff;
+  }
+  #letters button { 
+    margin: 5px; 
+    padding: 12px 18px; 
+    font-size: 1em; 
+    cursor: pointer; 
+    border: none; 
+    border-radius: 10px; 
+    background-color: #2980b9; 
+    color: white; 
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
+  }
+  #letters button:hover:not(:disabled) { 
+    background-color: #3498db; 
+    transform: scale(1.05);
+  }
+  #letters button:disabled { 
+    background-color: #ccc; 
+    cursor: not-allowed; 
+    transform: none;
+  }
+  #wrong-guesses { 
+    margin: 20px; 
+    font-size: 1.2em; 
+    color: #c0392b; 
+  }
+  #message { 
+    font-size: 1.3em; 
+    margin: 15px; 
+    color: green; 
+    min-height: 25px;
+  }
+  #hangman { 
+    margin: 20px auto; 
+    width: 140px; 
+    height: 180px; 
+    position: relative; 
+  }
+  .stick-part { 
+    display: none; 
+    position: absolute; 
+    background-color: #000; 
+  }
+  #base { bottom: 0; left: 0; width: 140px; height: 10px; }
+  #pole { bottom: 10px; left: 60px; width: 10px; height: 170px; }
+  #beam { top: 0; left: 60px; width: 80px; height: 10px; }
+  #rope { top: 10px; left: 140px; width: 2px; height: 25px; background-color: black; }
+  #head { top: 35px; left: 130px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
+  #body { top: 55px; left: 139px; width: 2px; height: 60px; background-color: black; }
+  #left-arm { top: 65px; left: 139px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: left; background-color: black; }
+  #right-arm { top: 65px; left: 102px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: right; background-color: black; }
+  #left-leg { top: 115px; left: 139px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: left; background-color: black; }
+  #right-leg { top: 115px; left: 102px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: right; background-color: black; }
+  #start { 
+    margin-top: 20px; 
+    padding: 12px 25px; 
+    font-size: 1.1em; 
+    cursor: pointer; 
+    background-color: #27ae60; 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
+  }
+  #start:hover { 
+    background-color: #2ecc71; 
+    transform: scale(1.05);
+  }
 </style>
 </head>
 <body>
@@ -108,7 +191,6 @@ function guess(letter, btn) {
     wrong++;
     wrongDiv.textContent = `Wrong guesses: ${wrong} / ${maxWrong}`;
 
-    // Feedback messages
     if (wrong === 2) messageDiv.textContent = "Keep trying! You can do it!";
     if (wrong === 4) messageDiv.textContent = "Almost there, don’t give up!";
 
@@ -122,7 +204,7 @@ function guess(letter, btn) {
     if (!word.split("").some(l => !guessed.includes(l))) {
       messageDiv.style.color = "green";
       messageDiv.textContent = "Congratulations! You found the word!";
-      displayWord(); // reveal word on win
+      displayWord(); 
       disableAllButtons();
     }
   }
