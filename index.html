@@ -10,46 +10,46 @@
     font-family: 'Poppins', Arial, sans-serif; 
     text-align: center; 
     margin: 0; 
-    padding: 0; 
-    background: linear-gradient(135deg, #74ebd5, #ACB6E5); 
+    padding: 40px 0; 
+    background: #ffffff; /* white Canva-style */
     min-height: 100vh; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    justify-content: flex-start;
-    padding-top: 40px;
   }
   h1 { 
     color: #2c3e50; 
     font-size: 2em; 
     margin-bottom: 20px; 
-    text-shadow: 1px 1px 2px #fff; 
   }
   #clue { 
     font-size: 1.2em; 
     margin: 15px; 
     color: #34495e; 
     max-width: 90%; 
-    background: rgba(255,255,255,0.7); 
-    padding: 10px 15px; 
+    background: rgba(255,255,255,0.9); 
+    padding: 12px 18px; 
     border-radius: 12px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
   }
   #word {
     font-size: 2em;
-    letter-spacing: 15px;
-    margin: 20px;
-    color: #2c3e50;
-    text-shadow: 1px 1px #fff;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    margin: 25px 0;
   }
   #word span {
     display: inline-block;
-    width: 30px;
+    width: 40px;          
+    height: 50px;         
+    line-height: 50px;    
     border-bottom: 3px solid #2c3e50;
     text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0 5px;       
   }
   #letters button { 
     margin: 5px; 
@@ -60,7 +60,7 @@
     border-radius: 10px; 
     background-color: #2980b9; 
     color: white; 
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     transition: background 0.3s, transform 0.2s;
   }
   #letters button:hover:not(:disabled) { 
@@ -113,7 +113,7 @@
     color: white; 
     border: none; 
     border-radius: 12px; 
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     transition: background 0.3s, transform 0.2s;
   }
   #start:hover { 
@@ -146,7 +146,7 @@
 <button id="start">Start Hangman</button>
 
 <script>
-let word = "BUNGLE"; // tomorrow's word
+let word = "BUNGLE"; 
 let clueText = "You’ve heard this before… don’t mess it up.";
 let guessed = [];
 let wrong = 0;
@@ -166,7 +166,7 @@ function displayWord() {
   wordDiv.innerHTML = "";
   for (let char of word) {
     const span = document.createElement('span');
-    span.textContent = guessed.includes(char) ? char : "";
+    span.textContent = guessed.includes(char) ? char : ""; 
     wordDiv.appendChild(span);
   }
 }
