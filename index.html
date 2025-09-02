@@ -195,7 +195,7 @@ const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
 // Fetch JSON for daily word
-fetch("words.json")
+fetch("https://raw.githubusercontent.com/<lourdselt>/<repo>/main/words.json")
   .then(res => res.json())
   .then(data => {
     word = data.word.toUpperCase();
@@ -206,7 +206,7 @@ fetch("words.json")
     console.error("Error loading words.json:", err);
     clueDiv.textContent = "Error loading daily word!";
   });
-
+  
 function displayWord() {
   wordDiv.innerHTML = "";
   for (let char of word) {
