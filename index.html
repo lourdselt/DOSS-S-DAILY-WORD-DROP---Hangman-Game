@@ -11,7 +11,7 @@
     text-align: center; 
     margin: 0; 
     padding: 40px 0; 
-    background: #ffffff; /* Canva white style */
+    background: linear-gradient(to bottom, #f9f9f9, #e0f7fa);
     min-height: 100vh; 
     display: flex; 
     flex-direction: column; 
@@ -22,16 +22,32 @@
     font-size: 2em; 
     margin-bottom: 20px; 
   }
-  #clue { 
-    font-size: 1.2em; 
-    margin: 15px; 
-    color: #34495e; 
-    max-width: 90%; 
-    background: rgba(255,255,255,0.9); 
-    padding: 12px 18px; 
-    border-radius: 12px;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+
+  /* Clue Box */
+  #clue {
+    font-size: 1.2em;
+    margin: 15px;
+    color: #2c3e50;
+    max-width: 90%;
+    padding: 15px 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: transform 0.3s ease, background 0.3s ease;
+    animation: fadeIn 0.8s ease-out;
   }
+  #clue:hover {
+    transform: scale(1.03);
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+
   #word {
     font-size: 2em;
     display: flex;
@@ -50,6 +66,17 @@
     font-weight: bold;
     color: #2c3e50;
     margin: 0 5px;       
+    transition: all 0.3s ease;
+  }
+  #word span.show {
+    transform: scale(1.2);
+    color: #2980b9;
+  }
+
+  #letters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   #letters button { 
     margin: 5px; 
@@ -58,13 +85,13 @@
     cursor: pointer; 
     border: none; 
     border-radius: 10px; 
-    background-color: #2980b9; 
+    background: linear-gradient(135deg, #2980b9, #3498db);
     color: white; 
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     transition: background 0.3s, transform 0.2s;
   }
   #letters button:hover:not(:disabled) { 
-    background-color: #3498db; 
+    background: linear-gradient(135deg, #3498db, #5dade2);
     transform: scale(1.05);
   }
   #letters button:disabled { 
@@ -72,6 +99,7 @@
     cursor: not-allowed; 
     transform: none;
   }
+
   #wrong-guesses { 
     margin: 20px; 
     font-size: 1.2em; 
@@ -83,6 +111,7 @@
     color: green; 
     min-height: 25px;
   }
+
   #hangman { 
     margin: 20px auto; 
     width: 160px; 
@@ -94,11 +123,13 @@
     position: absolute; 
     background-color: #000; 
   }
+
   /* Hanger parts */
   #base { bottom: 0; left: 0; width: 160px; height: 10px; display: block; }
   #pole { bottom: 10px; left: 70px; width: 10px; height: 190px; display: block; }
   #beam { top: 0; left: 70px; width: 90px; height: 10px; display: block; }
   #rope { top: 10px; left: 160px; width: 2px; height: 25px; display: block; background-color: black; }
+
   /* Human figure parts */
   #head { top: 35px; left: 150px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
   #body { top: 55px; left: 159px; width: 2px; height: 60px; background-color: black; }
@@ -106,6 +137,7 @@
   #right-arm { top: 65px; left: 122px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: right; background-color: black; }
   #left-leg { top: 115px; left: 159px; width: 35px; height: 2px; transform: rotate(45deg); transform-origin: left; background-color: black; }
   #right-leg { top: 115px; left: 122px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: right; background-color: black; }
+
   #start { 
     margin-top: 20px; 
     padding: 12px 25px; 
@@ -128,7 +160,7 @@
 
 <h1>Doss's Daily Word Drop – Hangman Edition</h1>
 
-<div id="clue"></div>
+<div id="clue">Loading daily word…</div>
 <div id="word"></div>
 <div id="letters"></div>
 <div id="wrong-guesses">Wrong guesses: 0 / 6</div>
@@ -148,8 +180,8 @@
 <button id="start">Start Hangman</button>
 
 <script>
-let word = "BUNGLE"; 
-let clueText = "You’ve heard this before… don’t mess it up.";
+let word = "";
+let clueText = "";
 let guessed = [];
 let wrong = 0;
 const maxWrong = 6;
@@ -162,13 +194,25 @@ const messageDiv = document.getElementById('message');
 const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
-clueDiv.textContent = "Clue: " + clueText;
+// Fetch JSON for daily word
+fetch("words.json")
+  .then(res => res.json())
+  .then(data => {
+    word = data.word.toUpperCase();
+    clueText = data.clue;
+    clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
+  })
+  .catch(err => {
+    console.error("Error loading words.json:", err);
+    clueDiv.textContent = "Error loading daily word!";
+  });
 
 function displayWord() {
   wordDiv.innerHTML = "";
   for (let char of word) {
     const span = document.createElement('span');
     span.textContent = guessed.includes(char) ? char : ""; 
+    if (guessed.includes(char)) span.classList.add("show");
     wordDiv.appendChild(span);
   }
 }
@@ -230,17 +274,4 @@ function startGame() {
     document.getElementById(p).style.display = "block";
   });
 
-  // Hide human parts
-  humanParts.forEach(p => {
-    document.getElementById(p).style.display = "none";
-  });
-
-  createButtons();
-  displayWord();
-  startBtn.style.display = "none";
-}
-startBtn.onclick = startGame;
-</script>
-
-</body>
-</html>
+  //
