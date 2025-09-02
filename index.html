@@ -180,8 +180,8 @@
 <button id="start">Start Hangman</button>
 
 <script>
-let word = "";
-let clueText = "";
+let word = "BUNGLE"; 
+let clueText = "You’ve heard this before… don’t mess it up.";
 let guessed = [];
 let wrong = 0;
 const maxWrong = 6;
@@ -194,19 +194,23 @@ const messageDiv = document.getElementById('message');
 const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
-// Fetch JSON for daily word
-fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
-  .then(res => res.json())
-  .then(data => {
-    word = data.word.toUpperCase();
-    clueText = data.clue;
-    clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
-  })
-  .catch(err => {
-    console.error("Error loading words.json:", err);
-    clueDiv.textContent = "Error loading daily word!";
-  });
-  
+// Fetch daily word from GitHub JSON
+window.onload = () => {
+  fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
+    .then(res => res.json())
+    .then(data => {
+      console.log("Fetched JSON:", data); // Debugging
+      word = data.word.toUpperCase();
+      clueText = data.clue;
+      clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
+      displayWord(); // Show initial underscores
+    })
+    .catch(err => {
+      console.error("Error loading words.json:", err);
+      clueDiv.textContent = "Error loading daily word!";
+    });
+};
+
 function displayWord() {
   wordDiv.innerHTML = "";
   for (let char of word) {
@@ -274,4 +278,15 @@ function startGame() {
     document.getElementById(p).style.display = "block";
   });
 
-  //
+  // Hide human parts
+  humanParts.forEach(p => {
+    document.getElementById(p).style.display = "none";
+  });
+
+  createButtons();
+  displayWord();
+  startBtn.style.display = "none";
+}
+
+startBtn.onclick = startGame;
+</script>
