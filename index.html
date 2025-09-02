@@ -23,7 +23,6 @@
     margin-bottom: 20px; 
   }
 
-  /* Clue Box */
   #clue {
     font-size: 1.2em;
     margin: 15px;
@@ -56,17 +55,17 @@
     margin: 25px 0;
   }
   #word span {
-    display: inline-block;
-    width: 50px;         
-    height: 60px;        
-    line-height: 60px;   
+    display: inline-flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 50px;
+    height: 60px;
     border-bottom: 3px solid #2c3e50;
-    text-align: center;
     font-size: 2em;
     font-weight: bold;
     color: #2c3e50;
-    margin: 0 5px;       
-    transition: all 0.3s ease;
+    margin: 0 6px;
+    box-sizing: border-box;
   }
   #word span.show {
     transform: scale(1.2);
@@ -95,9 +94,16 @@
     transform: scale(1.05);
   }
   #letters button:disabled { 
-    background-color: #ccc; 
     cursor: not-allowed; 
     transform: none;
+  }
+
+  /* clicked letter color */
+  button.clicked {
+    background: #95a5a6; 
+    color: #fff;
+    transform: scale(0.95);
+    transition: background 0.3s, transform 0.2s;
   }
 
   #wrong-guesses { 
@@ -194,25 +200,27 @@ const messageDiv = document.getElementById('message');
 const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
-// Fetch JSON for daily word
-fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
-  .then(res => res.json())
-  .then(data => {
+// Load JSON and start game
+async function loadWord() {
+  try {
+    const res = await fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json");
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const data = await res.json();
     word = data.word.toUpperCase();
     clueText = data.clue;
     clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
-    startGame(); // ✅ start after word loads
-  })
-  .catch(err => {
-    console.error("Error loading words.json:", err);
+    startGame();
+  } catch (err) {
+    console.error("Error loading JSON:", err);
     clueDiv.textContent = "Error loading daily word!";
-  });
-  
+  }
+}
+
 function displayWord() {
   wordDiv.innerHTML = "";
   for (let char of word) {
     const span = document.createElement('span');
-    span.textContent = guessed.includes(char) ? char : ""; 
+    span.textContent = guessed.includes(char) ? char : "\u00A0";
     if (guessed.includes(char)) span.classList.add("show");
     wordDiv.appendChild(span);
   }
@@ -232,61 +240,13 @@ function createButtons() {
 function guess(letter, btn) {
   if (guessed.includes(letter)) return;
   guessed.push(letter);
+
   btn.disabled = true;
+  btn.classList.add("clicked"); // mark as clicked
 
   if (!word.includes(letter)) {
     if (wrong < humanParts.length) {
       document.getElementById(humanParts[wrong]).style.display = "block";
     }
     wrong++;
-    wrongDiv.textContent = `Wrong guesses: ${wrong} / ${maxWrong}`;
-
-    if (wrong === 2) messageDiv.textContent = "Keep trying! You can do it!";
-    if (wrong === 4) messageDiv.textContent = "Almost there, don’t give up!";
-
-    if (wrong >= maxWrong) {
-      messageDiv.style.color = "red";
-      messageDiv.textContent = "Game Over! Try again tomorrow.";
-      disableAllButtons();
-    }
-  } else {
-    displayWord();
-    if (!word.split("").some(l => !guessed.includes(l))) {
-      messageDiv.style.color = "green";
-      messageDiv.textContent = "Congratulations! You found the word!";
-      disableAllButtons();
-    }
-  }
-}
-
-function disableAllButtons() {
-  const buttons = lettersDiv.getElementsByTagName('button');
-  for (let btn of buttons) btn.disabled = true;
-}
-
-function startGame() {
-  guessed = [];
-  wrong = 0;
-  messageDiv.textContent = "";
-  messageDiv.style.color = "green";
-  wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
-
-  // Show hanger parts
-  ['base','pole','beam','rope'].forEach(p => {
-    document.getElementById(p).style.display = "block";
-  });
-
-  // Hide human parts
-  humanParts.forEach(p => {
-    document.getElementById(p).style.display = "none";
-  });
-
-  // Display blanks and letter buttons
-  displayWord();
-  createButtons();
-}
-
-startBtn.onclick = startGame;
-</script>
-</body>
-</html>
+    wrong
