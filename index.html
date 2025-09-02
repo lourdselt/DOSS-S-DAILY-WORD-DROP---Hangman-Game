@@ -48,24 +48,26 @@
   }
 
   #word {
-    font-size: 2em;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    flex-wrap: nowrap;
-    margin: 25px 0;
+    gap: 8px;
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 95vw;
+    box-sizing: border-box;
+    font-size: 2rem;
   }
+
   #word span {
-    display: inline-flex;
-    justify-content: center;
-    align-items: flex-end;
-    width: 50px;
+    display: inline-block;
+    min-width: 30px;
     height: 60px;
+    line-height: 60px;
     border-bottom: 3px solid #2c3e50;
-    font-size: 2em;
+    text-align: center;
     font-weight: bold;
     color: #2c3e50;
-    margin: 0 6px;
-    box-sizing: border-box;
   }
   #word span.show {
     transform: scale(1.2);
@@ -98,12 +100,23 @@
     transform: none;
   }
 
-  /* clicked letter color */
-  button.clicked {
-    background: #95a5a6; 
-    color: #fff;
+  /* clicked letter */
+  #letters button.clicked {
+    background: #95a5a6 !important;
+    color: #fff !important;
     transform: scale(0.95);
-    transition: background 0.3s, transform 0.2s;
+  }
+
+  /* correct guess */
+  #letters button.correct {
+    background: #27ae60 !important; 
+    color: #fff !important;
+  }
+
+  /* wrong guess */
+  #letters button.wrong {
+    background: #e74c3c !important; 
+    color: #fff !important;
   }
 
   #wrong-guesses { 
@@ -183,7 +196,6 @@
   <div id="left-leg" class="stick-part"></div>
   <div id="right-leg" class="stick-part"></div>
 </div>
-<button id="start">Start Hangman</button>
 
 <script>
 let word = "";
@@ -197,30 +209,27 @@ const wordDiv = document.getElementById('word');
 const lettersDiv = document.getElementById('letters');
 const wrongDiv = document.getElementById('wrong-guesses');
 const messageDiv = document.getElementById('message');
-const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
-// Load JSON and start game
-async function loadWord() {
-  try {
-    const res = await fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json");
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    const data = await res.json();
+// Fetch JSON for daily word
+fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
+  .then(res => res.json())
+  .then(data => {
     word = data.word.toUpperCase();
     clueText = data.clue;
     clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
-    startGame();
-  } catch (err) {
-    console.error("Error loading JSON:", err);
+    startGame(); // auto-start game
+  })
+  .catch(err => {
+    console.error("Error loading words.json:", err);
     clueDiv.textContent = "Error loading daily word!";
-  }
-}
-
+  });
+  
 function displayWord() {
   wordDiv.innerHTML = "";
   for (let char of word) {
     const span = document.createElement('span');
-    span.textContent = guessed.includes(char) ? char : "\u00A0";
+    span.textContent = guessed.includes(char) ? char : "\u00A0"; 
     if (guessed.includes(char)) span.classList.add("show");
     wordDiv.appendChild(span);
   }
@@ -240,13 +249,55 @@ function createButtons() {
 function guess(letter, btn) {
   if (guessed.includes(letter)) return;
   guessed.push(letter);
-
   btn.disabled = true;
-  btn.classList.add("clicked"); // mark as clicked
+  btn.classList.add("clicked");
 
   if (!word.includes(letter)) {
+    btn.classList.add("wrong");
     if (wrong < humanParts.length) {
       document.getElementById(humanParts[wrong]).style.display = "block";
     }
     wrong++;
-    wrong
+    wrongDiv.textContent = `Wrong guesses: ${wrong} / ${maxWrong}`;
+
+    if (wrong === 2) messageDiv.textContent = "Keep trying! You can do it!";
+    if (wrong === 4) messageDiv.textContent = "Almost there, don’t give up!";
+
+    if (wrong >= maxWrong) {
+      messageDiv.style.color = "red";
+      messageDiv.textContent = "Game Over! Try again tomorrow.";
+      disableAllButtons();
+    }
+  } else {
+    btn.classList.add("correct");
+    displayWord();
+    if (!word.split("").some(l => !guessed.includes(l))) {
+      messageDiv.style.color = "green";
+      messageDiv.textContent = "Congratulations! You found the word!";
+      disableAllButtons();
+    }
+  }
+}
+
+function disableAllButtons() {
+  const buttons = lettersDiv.getElementsByTagName('button');
+  for (let btn of buttons) btn.disabled = true;
+}
+
+function startGame() {
+  guessed = [];
+  wrong = 0;
+  messageDiv.textContent = "";
+  wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
+
+  // Show hanger
+  ['base','pole','beam','rope'].forEach(p => {
+    document.getElementById(p).style.display = "block";
+  });
+
+  createButtons();
+  displayWord();
+}
+</script>
+</body>
+</html>
