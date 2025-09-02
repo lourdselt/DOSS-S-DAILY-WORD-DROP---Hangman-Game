@@ -201,6 +201,7 @@ fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hang
     word = data.word.toUpperCase();
     clueText = data.clue;
     clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
+    startGame(); // ✅ start after word loads
   })
   .catch(err => {
     console.error("Error loading words.json:", err);
@@ -267,11 +268,25 @@ function startGame() {
   guessed = [];
   wrong = 0;
   messageDiv.textContent = "";
+  messageDiv.style.color = "green";
   wrongDiv.textContent = `Wrong guesses: 0 / ${maxWrong}`;
 
-  // Show hanger
+  // Show hanger parts
   ['base','pole','beam','rope'].forEach(p => {
     document.getElementById(p).style.display = "block";
   });
 
-  //
+  // Hide human parts
+  humanParts.forEach(p => {
+    document.getElementById(p).style.display = "none";
+  });
+
+  // Display blanks and letter buttons
+  displayWord();
+  createButtons();
+}
+
+startBtn.onclick = startGame;
+</script>
+</body>
+</html>
