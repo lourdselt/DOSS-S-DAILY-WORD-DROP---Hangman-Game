@@ -23,7 +23,7 @@
     margin-bottom: 20px; 
   }
 
-  /* Clue Box – Modern Glass Effect */
+  /* Clue Box */
   #clue {
     font-size: 1.2em;
     margin: 15px;
@@ -31,8 +31,8 @@
     max-width: 90%;
     padding: 15px 20px;
     border-radius: 15px;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     border: 1px solid rgba(255,255,255,0.3);
     transition: transform 0.3s ease, background 0.3s ease;
@@ -40,27 +40,29 @@
   }
   #clue:hover {
     transform: scale(1.03);
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.6);
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px);}
     to { opacity: 1; transform: translateY(0);}
   }
 
-  /* Responsive word display */
+  /* Word container */
   #word {
     font-size: 2em;
     display: flex;
-    justify-content: space-between; 
-    flex-wrap: nowrap; 
-    margin: 25px 10px; 
-    max-width: 95%; 
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin: 25px 5px;
+    overflow-x: auto;
+    padding: 0 5px;
   }
   #word span {
-    flex: 1;            
-    min-width: 30px;    
-    height: 60px;
-    line-height: 60px;
+    flex: 0 0 auto;
+    width: 50px;         
+    min-width: 30px;
+    height: 60px;        
+    line-height: 60px;   
     border-bottom: 3px solid #2c3e50;
     text-align: center;
     font-size: 2em;
@@ -73,14 +75,25 @@
     transform: scale(1.2);
     color: #2980b9;
   }
+  #word::-webkit-scrollbar {
+    height: 6px;
+  }
+  #word::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+  }
+
+  /* Mobile adjustments */
   @media (max-width: 400px) {
     #word span {
-      font-size: 1.6em;
+      width: 40px;
+      font-size: 1.5em;
       height: 50px;
       line-height: 50px;
     }
   }
 
+  /* Letter buttons */
   #letters {
     display: flex;
     flex-wrap: wrap;
@@ -120,6 +133,7 @@
     min-height: 25px;
   }
 
+  /* Hangman */
   #hangman { 
     margin: 20px auto; 
     width: 160px; 
@@ -131,14 +145,10 @@
     position: absolute; 
     background-color: #000; 
   }
-
-  /* Hanger parts */
   #base { bottom: 0; left: 0; width: 160px; height: 10px; display: block; }
   #pole { bottom: 10px; left: 70px; width: 10px; height: 190px; display: block; }
   #beam { top: 0; left: 70px; width: 90px; height: 10px; display: block; }
   #rope { top: 10px; left: 160px; width: 2px; height: 25px; display: block; background-color: black; }
-
-  /* Human figure parts */
   #head { top: 35px; left: 150px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid black; background: none; }
   #body { top: 55px; left: 159px; width: 2px; height: 60px; background-color: black; }
   #left-arm { top: 65px; left: 159px; width: 35px; height: 2px; transform: rotate(-45deg); transform-origin: left; background-color: black; }
@@ -207,6 +217,7 @@ window.onload = () => {
   fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
     .then(res => res.json())
     .then(data => {
+      console.log("Fetched JSON:", data);
       word = data.word.toUpperCase();
       clueText = data.clue;
       clueDiv.textContent = (data.icon || "💡") + " Clue: " + clueText;
@@ -233,4 +244,11 @@ function createButtons() {
   for (let i = 65; i <= 90; i++) {
     const letter = String.fromCharCode(i);
     const button = document.createElement('button');
-    button
+    button.textContent = letter;
+    button.onclick = () => guess(letter, button);
+    lettersDiv.appendChild(button);
+  }
+}
+
+function guess(letter, btn) {
+  if (guessed.includes(letter)) return
