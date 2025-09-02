@@ -195,7 +195,7 @@ const startBtn = document.getElementById('start');
 const clueDiv = document.getElementById('clue');
 
 // Fetch JSON for daily word
-fetch("https://raw.githubusercontent.com/<lourdselt>/<repo>/main/words.json")
+fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
   .then(res => res.json())
   .then(data => {
     word = data.word.toUpperCase();
