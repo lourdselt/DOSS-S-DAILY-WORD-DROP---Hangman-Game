@@ -263,7 +263,8 @@ button.correct.bounce, button.wrong.bounce {
 <audio id="bg-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
-// JavaScript remains the same as previous fully working version
+// JavaScript remains mostly the same
+
 let word="", clueText="", guessed=[], wrong=0;
 const maxWrong=6;
 const humanParts=["head","body","left-arm","right-arm","left-leg","right-leg"];
@@ -277,20 +278,30 @@ const correctSound=document.getElementById("correct-sound");
 const wrongSound=document.getElementById("wrong-sound");
 const bgAudio=document.getElementById("bg-audio");
 
+// Display date
 function updateDate(){
   const today=new Date();
   const options={year:'numeric',month:'long',day:'numeric'};
   dateDiv.textContent="Word of the Day: "+today.toLocaleDateString(undefined,options);
+
+  // Happy Teacher's Day message on 5th September
+  const day=today.getDate();
+  const month=today.getMonth()+1;
+  if(day===5 && month===9){
+    messageDiv.style.color="purple";
+    messageDiv.textContent="🎉 Happy Teacher's Day! 🎉";
+  }
 }
 updateDate();
 
+// Fetch daily word
 function fetchWord(){
   fetch("https://raw.githubusercontent.com/lourdselt/DOSS-S-DAILY-WORD-DROP---Hangman-Game/main/words.json")
   .then(res=>res.json())
   .then(data=>{
     word=data.word.toUpperCase();
     clueText=data.clue;
-    clueDiv.textContent=(data.icon||"💡")+" Clue: "+clueText;
+    clueDiv.textContent=clueText;
     clueDiv.classList.add("bounce");
     setTimeout(()=>clueDiv.classList.remove("bounce"),800);
     startGame();
@@ -300,6 +311,7 @@ function fetchWord(){
   });
 }
 
+// Display the word with dashes
 function displayWord(){
   wordDiv.innerHTML="";
   for(let char of word){
@@ -310,6 +322,7 @@ function displayWord(){
   }
 }
 
+// Create letter buttons
 function createButtons(){
   lettersDiv.innerHTML="";
   for(let i=65;i<=90;i++){
@@ -321,6 +334,7 @@ function createButtons(){
   }
 }
 
+// Handle guesses
 function guess(letter,btn){
   if(guessed.includes(letter)) return;
   guessed.push(letter);
@@ -351,31 +365,35 @@ function guess(letter,btn){
     displayWord();
     if(!word.split("").some(l=>!guessed.includes(l))){
       messageDiv.style.color="green";
-      messageDiv.textContent="🎉 Congratulations! You found the word!";
+      messageDiv.textContent="🎉 Congratulations! You found the word! 🎉";
       triggerConfetti();
       disableAllButtons();
     }
   }
 }
 
+// Disable all buttons
 function disableAllButtons(){
   const buttons=lettersDiv.getElementsByTagName('button');
   for(let btn of buttons) btn.disabled=true;
 }
 
+// Start / restart game
 function startGame(){
-  guessed=[]; wrong=0; messageDiv.textContent="";
+  guessed=[]; wrong=0; 
   wrongDiv.textContent=`Wrong guesses: 0 / ${maxWrong}`;
   humanParts.forEach(id=>document.getElementById(id).classList.remove("show"));
   displayWord(); createButtons();
 }
 
+// Buttons
 document.getElementById("start").onclick=()=>startGame();
 document.getElementById("bg-music").onclick=()=>{
   if(bgAudio.paused){ bgAudio.play(); document.getElementById("bg-music").textContent="🔇 Stop Music"; }
   else { bgAudio.pause(); document.getElementById("bg-music").textContent="🎵 Play Music"; }
 }
 
+// Confetti animation
 function triggerConfetti(){
   const count=30;
   for(let i=0;i<count;i++){
@@ -398,5 +416,6 @@ function triggerConfetti(){
 
 fetchWord();
 </script>
+
 </body>
 </html>
